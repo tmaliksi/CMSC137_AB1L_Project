@@ -71,9 +71,7 @@ class Game:
 				for i in range(4):
 					print(str(i+1)," ",CARDS[i])
 				index = int(input("Enter number of card you wish to pass: "))
-				cardToPass = CARDS[index-1]
-				print(cardToPass)
-				del CARDS[index-1]
+				cardToPass = CARDS.pop(index-1)
 				s.send(cardToPass.encode('utf-8'))
 		s.close()
 

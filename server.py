@@ -27,8 +27,7 @@ class ClientThread(threading.Thread):
     def passCard(self,client):
         global CARDS
         index = len(CARDS) - 1
-        card = CARDS[index]
-        del CARDS[index]
+        card = CARDS.pop(index)
         client.giveCards(card)
 
 
@@ -90,8 +89,7 @@ class Game:
             if len(CARDS) != 0:
                 for client in CLIENTS:
                     index = random.randint(0,len(CARDS)-1)
-                    card = CARDS[index]
-                    del CARDS[index]
+                    card = CARDS.pop(index)
                     client.giveCards(card)
             else:
                 break
