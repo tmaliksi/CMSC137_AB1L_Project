@@ -18,7 +18,7 @@ class ClientThread(threading.Thread):
         # #do some checks and if msg == someWeirdSignal: break:
         # print(self.clientAddress, ' >> ', msg)
         # CARDS.append(msg.decode("utf-8"))
-    	#Maybe some code to compute the last digit of PI, play game or anything else can go here and when you are done.
+        #Maybe some code to compute the last digit of PI, play game or anything else can go here and when you are done.
         self.clientSocket.send(bytes(card,'utf-8'))
     def getCards(self):
         global CARDS
@@ -36,36 +36,29 @@ class Game:
     def main(self):
         menu_loop = True
         while menu_loop:
-            print('=======================================\n')
-            print('Welcome to 1-2-3 Pass!\n')
-            print('1 - Start Server')
-            print('2 - Instructions/Controls')
-            print('3 - Game Description')
-            print('4 - Quit')
-
-            menu_option = input('\nEnter: ')
-            print('\n=======================================')
+            print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Menu: \n ")
+            print(" [1] Start Server \n [2] Instructions/Controls \n [3] About the Game \n [4] Exit \n")
+            menu_option = input('\n >>> Enter: ')
+            print('\n -----------------------------------------------------------')
 
             if menu_option == '1':
-				#play_game()
-                input('Enter any key to continue.\n')
+                #play_game()
                 self.start_server()
             elif menu_option == '2':
-				#play_multi()
-                input('Enter any key to continue.\n')
-                self.connect_to_server()
+                #game instructions
+                self.game_instructions()
             elif menu_option == '3':
-				#display_instructions()
-                input('Enter any key to continue.\n')
+                #about the game
+                self.about_the_game()
             elif menu_option == '4':
-				#print('Aww man...')
+                #quit game
                 menu_loop = False
             else:
-                print('\nPlease choose a number.\n')
+                print('\n Please choose a number.\n')
 
     def start_server(self):
-        PORT = int(input("Enter port number: "))
-        NUMBER_OF_PLAYERS = int(input("Enter number of players: "))
+        PORT = int(input(" Enter port number: "))
+        NUMBER_OF_PLAYERS = int(input(" Enter number of players: "))
         global CLIENTS
         global SUITS, CARDS
         NUMBERS= list(range(1,NUMBER_OF_PLAYERS+1))
@@ -73,10 +66,10 @@ class Game:
             for suit in SUITS:
                 CARDS.append(str(number)+suit)
         while NUMBER_OF_PLAYERS <= 2:
-            print("Minimum number of players is 3")
-            NUMBER_OF_PLAYERS = int(input("Enter number of players: "))
+            print(" Minimum number of players is 3")
+            NUMBER_OF_PLAYERS = int(input(" Enter number of players: "))
 
-        print("Waiting for "+str(NUMBER_OF_PLAYERS)+" clients on port "+str(PORT)+"...")
+        print(" Waiting for "+str(NUMBER_OF_PLAYERS)+" clients on port "+str(PORT)+"...")
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # start connection using given port
         host = socket.gethostname()
@@ -104,5 +97,12 @@ class Game:
                         CLIENTS[i].passCard(CLIENTS[0])
                     else:
                         CLIENTS[i].passCard(CLIENTS[i+1])
+
+    def game_instructions(self):
+        print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")	
+
+    def about_the_game(self):
+        print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n About the Game: \n This program is created by Peter John Castillo, Abigail \n Fernandez, Troy Abraham Maliksi, and Arvin Sartillo as part \n of the final requirements for CMSC 137 Data Communications \n and Networking. \n -----------------------------------------------------------\n")
+
 game = Game()
 game.main()
