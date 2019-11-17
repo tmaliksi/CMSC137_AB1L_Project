@@ -19,17 +19,17 @@ class Game:
 
 			if menu_option == '1':
 				#play_game()
-				input('Press enter to continue.')
+				input('Press enter to continue.\n')
 			elif menu_option == '2':
 				#play_multi()
-				input('Press enter to continue.')
+				input('Press enter to continue.\n')
 				self.connect_to_server()
 			elif menu_option == '3':
 				#display_instructions()
-				input('Press enter to continue.')
+				input('Press enter to continue.\n')
 			elif menu_option == '4':
 				#display_description()
-				input('Press enter to continue.')
+				input('Press enter to continue.\n')
 			elif menu_option == '5':
 				#print('Aww man...')
 				menu_loop = False
@@ -54,20 +54,19 @@ class Game:
 	def connect_to_server(self):
 		HOST = input("Enter hostname: ")
 		PORT = int(input("Enter port number: "))
-		MESSAGE = str.encode(sys.argv[3])
+		MESSAGE = "aaa"
 
-		with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.connect((HOST,PORT))
+		while True:
 			# connect to user-given host and port
-			s.connect((HOST,PORT))
 			# send user-given message
-			s.sendall(MESSAGE)
+			s.sendall(MESSAGE.encode('utf-8'))
 			# receive from server
 			data = s.recv(1024)
+			print("\nMessage from server: "+data.decode("utf-8")+"\n")
 			# close connection
-			s.close()
-
-		# print message from server
-		print("\nMessage from server: "+data.decode("utf-8")+"\n")
+		s.close()
 
 game = Game()
 game.main()
