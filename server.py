@@ -1,7 +1,3 @@
-# Author: Maliksi, Troy Abraham C.
-# Date: 10-21-19
-# CMSC 137 - AB1L
-
 # import needed modules
 import socket, sys, _thread
 
