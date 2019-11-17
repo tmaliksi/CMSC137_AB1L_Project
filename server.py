@@ -1,7 +1,9 @@
 # import needed modules
-import socket, sys, _thread, threading
+import random, socket, sys, threading
 
-message = "Hi!"
+SUITS = ["C","S","H","D"]
+CARDS = []
+CLIENTS = []
 
 class ClientThread(threading.Thread):
     def __init__(self,clientSocket,clientAddress):
@@ -10,25 +12,25 @@ class ClientThread(threading.Thread):
         self.clientAddress = clientAddress
         print("New connection added: ", clientAddress)
 
-    def run(self):
+    def giveCards(self, card):
         # print("Connection from :", self.clientAddress)
-        global message
-        msg = self.clientSocket.recv(1024)
-        #do some checks and if msg == someWeirdSignal: break:
-        print(self.clientAddress, ' >> ', msg)
+        # msg = self.clientSocket.recv(1024)
+        # #do some checks and if msg == someWeirdSignal: break:
+        # print(self.clientAddress, ' >> ', msg)
+        # CARDS.append(msg.decode("utf-8"))
     	#Maybe some code to compute the last digit of PI, play game or anything else can go here and when you are done.
-        self.clientSocket.send(bytes(message,'utf-8'))
+        self.clientSocket.send(bytes(card,'utf-8'))
+    def getCards(self):
+        global CARDS
+        card = self.clientSocket.recv(1024)
+        CARDS.append(card.decode("utf-8"))
+    def passCard(self,client):
+        global CARDS
+        index = len(CARDS) - 1
+        card = CARDS[index]
+        del CARDS[index]
+        client.giveCards(card)
 
-# def on_new_client(clientsocket,addr):
-#     while True:
-#         msg = clientsocket.recv(1024)
-#         #do some checks and if msg == someWeirdSignal: break:
-#         print(addr, ' >> ', msg)
-#         msg = input('SERVER >> ')
-#         msg = bytes(msg,'utf-8')
-# 		#Maybe some code to compute the last digit of PI, play game or anything else can go here and when you are done.
-#         clientsocket.sendall(msg)
-#     clientsocket.close()
 
 class Game:
     def main(self):
@@ -64,7 +66,12 @@ class Game:
     def start_server(self):
         PORT = int(input("Enter port number: "))
         NUMBER_OF_PLAYERS = int(input("Enter number of players: "))
-        CLIENTS = []
+        global CLIENTS
+        global SUITS, CARDS
+        NUMBERS= list(range(1,NUMBER_OF_PLAYERS+1))
+        for number in NUMBERS:
+            for suit in SUITS:
+                CARDS.append(str(number)+suit)
         while NUMBER_OF_PLAYERS <= 2:
             print("Minimum number of players is 3")
             NUMBER_OF_PLAYERS = int(input("Enter number of players: "))
@@ -80,22 +87,22 @@ class Game:
             clientSocket, clientAddress = s.accept()
             CLIENTS.append(ClientThread(clientSocket,clientAddress))
         while True:
-            global message
-            message = input("Enter message: ")
+            if len(CARDS) != 0:
+                for client in CLIENTS:
+                    index = random.randint(0,len(CARDS)-1)
+                    card = CARDS[index]
+                    del CARDS[index]
+                    client.giveCards(card)
+            else:
+                break
+        while True:
             for client in CLIENTS:
-                client.run()
-        # accept connection and assign to addr the ip address of client
-        # with conn:
-        # addresses = []
-        # connections = []
-        # i = 0
-        # while True:
-        #     while i != NUMBER_OF_PLAYERS:
-        #         conn, addr = s.accept()
-        #         addresses.append(addr)
-        #         connections.append(conn)
-        #         i += 1
-        #     for i in range(NUMBER_OF_PLAYERS):
-        #         _thread.start_new_thread(on_new_client,(connections[i],addresses[i]))
+                client.getCards()
+            if(len(CARDS) == NUMBER_OF_PLAYERS):
+                for i in range(len(CLIENTS)):
+                    if(i == 0):
+                        CLIENTS[i].passCard(CLIENTS[0])
+                    else:
+                        CLIENTS[i].passCard(CLIENTS[i+1])
 game = Game()
 game.main()

@@ -1,5 +1,7 @@
 # import needed modules
-import socket, sys
+import os, socket, sys
+
+CARDS = []
 
 class Game:
 	def main(self):
@@ -19,17 +21,17 @@ class Game:
 
 			if menu_option == '1':
 				#play_game()
-				input('Press enter to continue.\n')
+				input('Enter any key to continue.\n')
 			elif menu_option == '2':
 				#play_multi()
-				input('Press enter to continue.\n')
+				input('Enter any key to continue.\n')
 				self.connect_to_server()
 			elif menu_option == '3':
 				#display_instructions()
-				input('Press enter to continue.\n')
+				input('Enter any key to continue.\n')
 			elif menu_option == '4':
 				#display_description()
-				input('Press enter to continue.\n')
+				input('Enter any key to continue.\n')
 			elif menu_option == '5':
 				#print('Aww man...')
 				menu_loop = False
@@ -54,18 +56,25 @@ class Game:
 	def connect_to_server(self):
 		HOST = input("Enter hostname: ")
 		PORT = int(input("Enter port number: "))
-		MESSAGE = "aaa"
+		global CARDS
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((HOST,PORT))
 		while True:
 			# connect to user-given host and port
-			# send user-given message
-			s.sendall(MESSAGE.encode('utf-8'))
 			# receive from server
-			data = s.recv(1024)
-			print("\nMessage from server: "+data.decode("utf-8")+"\n")
-			# close connection
+			while len(CARDS) != 4:
+				data = s.recv(1024)
+				CARDS.append(data.decode("utf-8"))
+			if len(CARDS) == 4:
+				os.system('clear')
+				for i in range(4):
+					print(str(i+1)," ",CARDS[i])
+				index = int(input("Enter number of card you wish to pass: "))
+				cardToPass = CARDS[index-1]
+				print(cardToPass)
+				del CARDS[index-1]
+				s.send(cardToPass.encode('utf-8'))
 		s.close()
 
 game = Game()
