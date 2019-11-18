@@ -51,7 +51,15 @@ class Game:
 			if len(CARDS) == 4:
 				os.system('clear')
 				for i in range(4):
-					print(str(i+1)," ",CARDS[i])
+					print(str(i+1), ": ", CARDS[i][0], end="")
+					if CARDS[i][1] == "C":
+						print(" of Clubs")
+					elif CARDS[i][1] == "S":
+						print(" of Spades")
+					elif CARDS[i][1] == "H":
+						print(" of Hearts")
+					else:
+						print(" of Diamonds")
 
 				index = int(input("Enter number of card you wish to pass: "))
 				cardToPass = CARDS.pop(index-1)
