@@ -8,7 +8,7 @@ class Game:
 		menu_loop = True
 		while menu_loop:
 			print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Menu: \n ")
-			print(" [1] Start Server \n [2] Instructions/Controls \n [3] About the Game \n [4] Exit \n")
+			print(" [1] Connect to a server \n [2] Instructions/Controls \n [3] About the Game \n [4] Exit \n")
 			menu_option = input('\n >>> Enter: ')
 			print('\n -----------------------------------------------------------')
 
@@ -29,22 +29,22 @@ class Game:
 
 
 	def display_instructions(self):
-		print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")	
+		print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")
 
 	def display_description(self):
 	 print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n About the Game: \n This program is created by Peter John Castillo, Abigail \n Fernandez, Troy Abraham Maliksi, and Arvin Sartillo as part \n of the final requirements for CMSC 137 Data Communications \n and Networking. \n -----------------------------------------------------------\n")
 
 
 	def connect_to_server(self):
-		HOST = input(" Enter hostname: ")
-		PORT = int(input(" Enter port number: "))
+		# HOST = input(" Enter hostname: ")
+		# PORT = int(input(" Enter port number: "))
+		HOST = "Tulingan"
+		PORT = 8081
 		global CARDS
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((HOST,PORT))
 		while True:
-			# connect to user-given host and port
-			# receive from server
 			while len(CARDS) != 4:
 				data = s.recv(1024)
 				CARDS.append(data.decode("utf-8"))
