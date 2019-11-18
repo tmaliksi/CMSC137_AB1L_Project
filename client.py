@@ -7,55 +7,37 @@ class Game:
 	def main(self):
 		menu_loop = True
 		while menu_loop:
-			print('=======================================\n')
-			print('Welcome to 1-2-3 Pass!\n')
-			print('1 - Play Solo Game')
-			print('2 - Play Multiplayer')
-			print('3 - Instructions/Controls')
-			print('4 - Game Description')
-			print('5 - Quit')
-
-			menu_option = input('\nEnter: ')
-
-			print('\n=======================================')
+			print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Menu: \n ")
+			print(" [1] Start Server \n [2] Instructions/Controls \n [3] About the Game \n [4] Exit \n")
+			menu_option = input('\n >>> Enter: ')
+			print('\n -----------------------------------------------------------')
 
 			if menu_option == '1':
-				#play_game()
-				input('Enter any key to continue.\n')
+					#play_game()
+					self.connect_to_server()
 			elif menu_option == '2':
-				#play_multi()
-				input('Enter any key to continue.\n')
-				self.connect_to_server()
+					#game instructions
+					self.display_instructions()
 			elif menu_option == '3':
-				#display_instructions()
-				input('Enter any key to continue.\n')
+					#about the game
+					self.display_description()
 			elif menu_option == '4':
-				#display_description()
-				input('Enter any key to continue.\n')
-			elif menu_option == '5':
-				#print('Aww man...')
-				menu_loop = False
+					#quit game
+					menu_loop = False
 			else:
-				print('\nPlease choose a number.\n')
+					print('\n Please choose a number.\n')
 
 
-	def display_instructions():
-		print('=======================================')
-		print('             INSTRUCTIONS              ')
-		print('=======================================')
+	def display_instructions(self):
+		print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")	
 
-		print('\ninstructions here\n')
+	def display_description(self):
+	 print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n About the Game: \n This program is created by Peter John Castillo, Abigail \n Fernandez, Troy Abraham Maliksi, and Arvin Sartillo as part \n of the final requirements for CMSC 137 Data Communications \n and Networking. \n -----------------------------------------------------------\n")
 
-	def display_description():
-		print('=======================================')
-		print('             DESCRIPTION               ')
-		print('=======================================')
-
-		print('\ndescription here\n')
 
 	def connect_to_server(self):
-		HOST = input("Enter hostname: ")
-		PORT = int(input("Enter port number: "))
+		HOST = input(" Enter hostname: ")
+		PORT = int(input(" Enter port number: "))
 		global CARDS
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -70,6 +52,7 @@ class Game:
 				os.system('clear')
 				for i in range(4):
 					print(str(i+1)," ",CARDS[i])
+
 				index = int(input("Enter number of card you wish to pass: "))
 				cardToPass = CARDS.pop(index-1)
 				s.send(cardToPass.encode('utf-8'))
