@@ -10,6 +10,7 @@ class ClientThread(threading.Thread):
         threading.Thread.__init__(self)
         self.clientSocket = clientSocket
         self.clientAddress = clientAddress
+        self.score = 0
         print("New connection added: ", clientAddress)
 
     def giveCards(self, card):
@@ -58,8 +59,8 @@ class Game:
         for number in NUMBERS:
             for suit in SUITS:
                 CARDS.append(str(number)+suit)
-        while NUMBER_OF_PLAYERS <= 2:
-            print(" Minimum number of players is 3")
+        while NUMBER_OF_PLAYERS <= 2 or NUMBER_OF_PLAYERS > 13:
+            print(" Minimum number of players is 3 and maximum is 13")
             NUMBER_OF_PLAYERS = int(input(" Enter number of players: "))
 
         print(" Waiting for "+str(NUMBER_OF_PLAYERS)+" clients on port "+str(PORT)+"...")
@@ -70,14 +71,12 @@ class Game:
         for i in range(NUMBER_OF_PLAYERS):
             clientSocket, clientAddress = s.accept()
             CLIENTS.append(ClientThread(clientSocket,clientAddress))
-        while True:
-            if len(CARDS) != 0:
-                for client in CLIENTS:
-                    index = random.randint(0,len(CARDS)-1)
-                    card = CARDS.pop(index)
-                    client.giveCards(card)
-            else:
-                break
+            
+        while len(CARDS) != 0:
+            for client in CLIENTS:
+                index = random.randint(0,len(CARDS)-1)
+                card = CARDS.pop(index)
+                client.giveCards(card)
         while True:
             for client in CLIENTS:
                 client.getCards()
@@ -87,6 +86,7 @@ class Game:
                         CLIENTS[i].passCard(CLIENTS[0])
                     else:
                         CLIENTS[i].passCard(CLIENTS[i+1])
+
 
     def game_instructions(self):
         print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")

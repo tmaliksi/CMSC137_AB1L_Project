@@ -36,10 +36,8 @@ class Game:
 
 
 	def connect_to_server(self):
-		# HOST = input(" Enter hostname: ")
-		# PORT = int(input(" Enter port number: "))
-		HOST = "Tulingan"
-		PORT = 8081
+		HOST = input(" Enter hostname: ")
+		PORT = int(input(" Enter port number: "))
 		global CARDS
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,15 +49,33 @@ class Game:
 			if len(CARDS) == 4:
 				os.system('clear')
 				for i in range(4):
-					print(str(i+1), ": ", CARDS[i][0], end="")
-					if CARDS[i][1] == "C":
+					if(len(CARDS[i]) > 2):
+						if(CARDS[i][0:1] == "10"):
+							print(str(i+1), ": ", CARDS[i][0:1], end="")
+						elif(CARDS[i][0:1] == "11"):
+							print(str(i+1), ": Jack", end="")
+						elif(CARDS[i][0:1] == "12"):
+							print(str(i+1), ": Queen", end="")
+						elif(CARDS[i][0:1] == "13"):
+							print(str(i+1), ": King", end="")
+					elif(CARDS[i][0] == "1"):
+						print(str(i+1), ": Ace", end="")
+					else:
+						print(str(i+1), ": ", CARDS[i][0], end="")
+					suit = CARDS[i][len(CARDS[i])-1]
+					if suit == "C":
 						print(" of Clubs")
-					elif CARDS[i][1] == "S":
+					elif suit == "S":
 						print(" of Spades")
-					elif CARDS[i][1] == "H":
+					elif suit == "H":
 						print(" of Hearts")
 					else:
 						print(" of Diamonds")
+
+				if(len(CARDS[0]) > 2):
+					kind = CARDS[0][0:1]
+				else:
+					kind = CARDS[0][0]
 
 				index = int(input("Enter number of card you wish to pass: "))
 				cardToPass = CARDS.pop(index-1)
