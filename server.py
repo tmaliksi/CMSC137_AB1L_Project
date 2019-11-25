@@ -10,20 +10,15 @@ class ClientThread(threading.Thread):
         threading.Thread.__init__(self)
         self.clientSocket = clientSocket
         self.clientAddress = clientAddress
+        self.score = 0
         print("New connection added: ", clientAddress)
 
     def giveCards(self, card):
-        # print("Connection from :", self.clientAddress)
-        # msg = self.clientSocket.recv(1024)
-        # #do some checks and if msg == someWeirdSignal: break:
-        # print(self.clientAddress, ' >> ', msg)
-        # CARDS.append(msg.decode("utf-8"))
-        #Maybe some code to compute the last digit of PI, play game or anything else can go here and when you are done.
         self.clientSocket.send(bytes(card,'utf-8'))
     def getCards(self):
         global CARDS
         card = self.clientSocket.recv(1024)
-        CARDS.append(card.decode("utf-8"))
+        CARDS.insert(0,card.decode("utf-8"))
     def passCard(self,client):
         global CARDS
         index = len(CARDS) - 1
@@ -64,40 +59,37 @@ class Game:
         for number in NUMBERS:
             for suit in SUITS:
                 CARDS.append(str(number)+suit)
-        while NUMBER_OF_PLAYERS <= 2:
-            print(" Minimum number of players is 3")
+        while NUMBER_OF_PLAYERS <= 2 or NUMBER_OF_PLAYERS > 13:
+            print(" Minimum number of players is 3 and maximum is 13")
             NUMBER_OF_PLAYERS = int(input(" Enter number of players: "))
 
         print(" Waiting for "+str(NUMBER_OF_PLAYERS)+" clients on port "+str(PORT)+"...")
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # start connection using given port
         host = socket.gethostname()
         s.bind((host,PORT))
-        # wait for client
         s.listen(5)
         for i in range(NUMBER_OF_PLAYERS):
             clientSocket, clientAddress = s.accept()
             CLIENTS.append(ClientThread(clientSocket,clientAddress))
-        while True:
-            if len(CARDS) != 0:
-                for client in CLIENTS:
-                    index = random.randint(0,len(CARDS)-1)
-                    card = CARDS.pop(index)
-                    client.giveCards(card)
-            else:
-                break
+            
+        while len(CARDS) != 0:
+            for client in CLIENTS:
+                index = random.randint(0,len(CARDS)-1)
+                card = CARDS.pop(index)
+                client.giveCards(card)
         while True:
             for client in CLIENTS:
                 client.getCards()
             if(len(CARDS) == NUMBER_OF_PLAYERS):
                 for i in range(len(CLIENTS)):
-                    if(i == 0):
+                    if(i == len(CLIENTS)-1):
                         CLIENTS[i].passCard(CLIENTS[0])
                     else:
                         CLIENTS[i].passCard(CLIENTS[i+1])
 
+
     def game_instructions(self):
-        print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")	
+        print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")
 
     def about_the_game(self):
         print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n About the Game: \n This program is created by Peter John Castillo, Abigail \n Fernandez, Troy Abraham Maliksi, and Arvin Sartillo as part \n of the final requirements for CMSC 137 Data Communications \n and Networking. \n -----------------------------------------------------------\n")
