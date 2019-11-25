@@ -100,9 +100,9 @@ class Game:
 						print("The player has completed a set of Kings!")
 						print("Player has won!")	
 						#add to score of player
-					os.system(clear)
 					else:
 						continue
+			os.system(clear)
 		s.close()
 
 game = Game()
