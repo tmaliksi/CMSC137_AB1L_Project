@@ -14,7 +14,10 @@ class ClientThread(threading.Thread):
         print("New connection added: ", clientAddress)
 
     def giveCards(self, card):
-        self.clientSocket.send(bytes(card,'utf-8'))
+        self.clientSocket.send(card.encode())
+        data = self.clientSocket.recv(1024)
+        if data.decode('utf-8') != "OK":
+            self.clientSocket.send(card.encode())
     def getCards(self):
         global CARDS
         card = self.clientSocket.recv(1024)
@@ -24,7 +27,6 @@ class ClientThread(threading.Thread):
         index = len(CARDS) - 1
         card = CARDS.pop(index)
         client.giveCards(card)
-
 
 class Game:
     def main(self):
@@ -51,6 +53,7 @@ class Game:
                 print('\n Please choose a number.\n')
 
     def start_server(self):
+        HOST = socket.gethostbyname(socket.gethostname())
         PORT = int(input(" Enter port number: "))
         NUMBER_OF_PLAYERS = int(input(" Enter number of players: "))
         global CLIENTS
@@ -59,19 +62,19 @@ class Game:
         for number in NUMBERS:
             for suit in SUITS:
                 CARDS.append(str(number)+suit)
+
         while NUMBER_OF_PLAYERS <= 2 or NUMBER_OF_PLAYERS > 13:
-            print(" Minimum number of players is 3 and maximum is 13")
+            print(" Minimum number of players is 3 and maximum number of players is 13")
             NUMBER_OF_PLAYERS = int(input(" Enter number of players: "))
 
-        print(" Waiting for "+str(NUMBER_OF_PLAYERS)+" clients on port "+str(PORT)+"...")
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        host = socket.gethostname()
-        s.bind((host,PORT))
-        s.listen(5)
+        # host = "192.168.1.20"
+        s.bind((HOST,PORT))
+        s.listen(1)
         for i in range(NUMBER_OF_PLAYERS):
+            print(" Waiting for "+str(NUMBER_OF_PLAYERS - len(CLIENTS))+" client/s on port "+str(PORT)+"...")
             clientSocket, clientAddress = s.accept()
             CLIENTS.append(ClientThread(clientSocket,clientAddress))
-            
         while len(CARDS) != 0:
             for client in CLIENTS:
                 index = random.randint(0,len(CARDS)-1)
