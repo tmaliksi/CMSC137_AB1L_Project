@@ -51,21 +51,7 @@ class Game:
 					s.send(b"OK")
 				print("Received" + data.decode("utf-8"))
 				CARDS.append(data.decode("utf-8"))
-			#loop for checking if the player won
-			winFlag = "NO"
-			if len(CARDS) == 4: 
-				for i in range(4):
-					print(CARDS[i] + CARDS[0][0])
-					if(CARDS[0][0] != CARDS[i][0] and i != 0):
-						if(i == 3):
-							winFlag = "YES"
-						break
-					
-			if(winFlag == "YES"):
-				s.send(winFlag.encode('utf-8'))
-				print("I WIN!!!!")
-				break
-			
+				
 			if len(CARDS) == 4:
 				os.system('clear')
 				for i in range(4):

@@ -4,7 +4,6 @@ import random, socket, sys, threading
 SUITS = ["C","S","H","D"]
 CARDS = []
 CLIENTS = []
-end = False
 
 class ClientThread(threading.Thread):
     def __init__(self,clientSocket,clientAddress):
@@ -12,6 +11,7 @@ class ClientThread(threading.Thread):
         self.clientSocket = clientSocket
         self.clientAddress = clientAddress
         self.score = 0
+        self.clientCards = []
         print("New connection added: ", clientAddress)
 
     def giveCards(self, card):
@@ -19,22 +19,22 @@ class ClientThread(threading.Thread):
         data = self.clientSocket.recv(1024)
         if data.decode('utf-8') != "OK":
             self.clientSocket.send(card.encode())
+        
     def getCards(self):
         global CARDS
         card = self.clientSocket.recv(1024)
         print(card.decode("utf-8"))
         CARDS.insert(0,card.decode("utf-8"))
+
     def passCard(self,client):
         global CARDS
         index = len(CARDS) - 1
         card = CARDS.pop(index)
         client.giveCards(card)
-    def checkWinner(self, client):
-        global end
-        winFlag = self.clientSocket.recv(1024)
-        print("Checking winner")
-        if(winFlag.decode('utf-8') == "YES"):
-            end = True
+    def showAllCards(self):
+        print(self.clientCards)
+    
+
 
 class Game:
     def main(self):
@@ -83,27 +83,27 @@ class Game:
             print(" Waiting for "+str(NUMBER_OF_PLAYERS - len(CLIENTS))+" client/s on port "+str(PORT)+"...")
             clientSocket, clientAddress = s.accept()
             CLIENTS.append(ClientThread(clientSocket,clientAddress))
+        
+        print(len(CLIENTS))
         while len(CARDS) != 0:
             for client in CLIENTS:
                 index = random.randint(0,len(CARDS)-1)
                 card = CARDS.pop(index)
+                client.clientCards.append(card)
                 client.giveCards(card)
-        while end != True:
-            
+        while True:
+            for client in CLIENTS:
+                print("Client "+str(CLIENTS.index(client))+" has " + str(client.clientCards))
             for client in CLIENTS:
                 client.getCards()
             if(len(CARDS) == NUMBER_OF_PLAYERS):
                 for i in range(len(CLIENTS)):
-                    CLIENTS[i].checkWinner(CLIENTS[i])
-                    if end == True:
-                        break
-            if(end != True):
-                if(len(CARDS) == NUMBER_OF_PLAYERS):
-                    for i in range(len(CLIENTS)):
-                        if(i == len(CLIENTS)-1):
-                            CLIENTS[i].passCard(CLIENTS[0])
-                        else:
-                            CLIENTS[i].passCard(CLIENTS[i+1])
+                    if(i == len(CLIENTS)-1):
+                        CLIENTS[i].passCard(CLIENTS[0])
+                    else:
+                        CLIENTS[i].passCard(CLIENTS[i+1])
+
+            
         print("GAME OVER!")
 
     def game_instructions(self):
