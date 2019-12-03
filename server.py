@@ -4,6 +4,7 @@ import random, socket, sys, threading
 SUITS = ["C","S","H","D"]
 CARDS = []
 CLIENTS = []
+end = False
 
 class ClientThread(threading.Thread):
     def __init__(self,clientSocket,clientAddress):
@@ -21,12 +22,19 @@ class ClientThread(threading.Thread):
     def getCards(self):
         global CARDS
         card = self.clientSocket.recv(1024)
+        print(card.decode("utf-8"))
         CARDS.insert(0,card.decode("utf-8"))
     def passCard(self,client):
         global CARDS
         index = len(CARDS) - 1
         card = CARDS.pop(index)
         client.giveCards(card)
+    def checkWinner(self, client):
+        global end
+        winFlag = self.clientSocket.recv(1024)
+        print("Checking winner")
+        if(winFlag.decode('utf-8') == "YES"):
+            end = True
 
 class Game:
     def main(self):
@@ -80,16 +88,23 @@ class Game:
                 index = random.randint(0,len(CARDS)-1)
                 card = CARDS.pop(index)
                 client.giveCards(card)
-        while True:
+        while end != True:
+            
             for client in CLIENTS:
                 client.getCards()
             if(len(CARDS) == NUMBER_OF_PLAYERS):
                 for i in range(len(CLIENTS)):
-                    if(i == len(CLIENTS)-1):
-                        CLIENTS[i].passCard(CLIENTS[0])
-                    else:
-                        CLIENTS[i].passCard(CLIENTS[i+1])
-
+                    CLIENTS[i].checkWinner(CLIENTS[i])
+                    if end == True:
+                        break
+            if(end != True):
+                if(len(CARDS) == NUMBER_OF_PLAYERS):
+                    for i in range(len(CLIENTS)):
+                        if(i == len(CLIENTS)-1):
+                            CLIENTS[i].passCard(CLIENTS[0])
+                        else:
+                            CLIENTS[i].passCard(CLIENTS[i+1])
+        print("GAME OVER!")
 
     def game_instructions(self):
         print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")
