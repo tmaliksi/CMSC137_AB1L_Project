@@ -65,14 +65,14 @@ class Game:
 
 
 	def connect_to_server(self):
-		# HOST = input(" Enter IP address of server: ")
-		# PORT = int(input(" Enter port number: "))
-		HOST = socket.gethostbyname(socket.gethostname())
-		PORT = 8080
+		HOST = input(" Enter IP address of server: ")
+		PORT = int(input(" Enter port number: "))
 		global CARDS, isEND, isWIN
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((HOST,PORT))
+		name = input(" Enter your name: ")
+		s.send(name.encode('utf-8'))
 		while True:
 			data = s.recv(5120)
 			try:

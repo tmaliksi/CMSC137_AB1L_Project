@@ -14,6 +14,7 @@ class ClientThread(threading.Thread):
         self.score = 0
         self.clientCards = []
         self.isWinner = False
+        self.name = clientSocket.recv(1024).decode('utf-8')
         print("New connection added: ", clientAddress)
 
     def getCards(self):
@@ -72,7 +73,7 @@ class Game:
                 print('\n Please choose a number.\n')
 
     def start_server(self):
-        HOST = socket.gethostbyname(socket.gethostname())
+        HOST = input(" Enter IP address: ")
         PORT = int(input(" Enter port number: "))
         NUMBER_OF_PLAYERS = int(input(" Enter number of players: "))
         global CLIENTS, SUITS, CARDS, isEND
@@ -117,7 +118,7 @@ class Game:
                     data_string = pickle.dumps(client.clientCards)
                     client.clientSocket.send(data_string)
             for client in CLIENTS:
-                print("Client "+str(CLIENTS.index(client))+" has " + str(client.clientCards))
+                print("Client "+client.name+" has " + str(client.clientCards))
             if(isEND):
                 break
             for client in CLIENTS:
@@ -131,7 +132,7 @@ class Game:
 
         print("GAME OVER!")
         for client in CLIENTS:
-            print("Client "+str(CLIENTS.index(client))+" has " + str(client.score))
+            print("Client "+client.name+" has " + str(client.score))
 
     def game_instructions(self):
         print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")
