@@ -23,15 +23,6 @@ class Card:
 		else:
 			self.suit = '\N{BLACK DIAMOND SUIT}'
 
-	def print(self):
-		print('┌───────┐')
-		print(f'| {self.value:<2}    |')
-		print('|       |')
-		print(f'|   {self.suit}   |')
-		print('|       |')
-		print(f'|    {self.value:>2} |')
-		print('└───────┘')
-
 class Game:
 	def main(self):
 		menu_loop = True
