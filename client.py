@@ -36,10 +36,10 @@ class Game:
 
 
 	def connect_to_server(self):
-		HOST = input(" Enter IP address of server: ")
-		PORT = int(input(" Enter port number: "))
-		# HOST = "192.168.1.20"
-		# PORT = 8080
+		# HOST = input(" Enter IP address of server: ")
+		# PORT = int(input(" Enter port number: "))
+		HOST = "192.168.1.6"
+		PORT = 8081
 		global CARDS
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,7 +49,9 @@ class Game:
 				data = s.recv(1024)
 				if data:
 					s.send(b"OK")
+				print("Received" + data.decode("utf-8"))
 				CARDS.append(data.decode("utf-8"))
+				
 			if len(CARDS) == 4:
 				os.system('clear')
 				for i in range(4):
