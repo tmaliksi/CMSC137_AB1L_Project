@@ -1,9 +1,10 @@
 # import needed modules
-import random, socket, sys, threading
+import pickle, random, socket, sys, threading
 
 SUITS = ["C","S","H","D"]
 CARDS = []
 CLIENTS = []
+isEND = False
 
 class ClientThread(threading.Thread):
     def __init__(self,clientSocket,clientAddress):
@@ -11,20 +12,40 @@ class ClientThread(threading.Thread):
         self.clientSocket = clientSocket
         self.clientAddress = clientAddress
         self.score = 0
+        self.clientCards = []
+        self.isWinner = False
         print("New connection added: ", clientAddress)
 
-    def giveCards(self, card):
-        self.clientSocket.send(bytes(card,'utf-8'))
     def getCards(self):
         global CARDS
         card = self.clientSocket.recv(1024)
-        CARDS.insert(0,card.decode("utf-8"))
+        print(card.decode("utf-8"))
+        CARDS.insert(0,self.clientCards.pop(int(card.decode("utf-8"))))
+
     def passCard(self,client):
         global CARDS
         index = len(CARDS) - 1
         card = CARDS.pop(index)
-        client.giveCards(card)
+        client.clientCards.append(card)
 
+    def showAllCards(self):
+        print(self.clientCards)
+
+    def checkIfComplete(self):
+        if(len(self.clientCards[0]) > 2):
+            kind = self.clientCards[0][0:1]
+        else:
+            kind = self.clientCards[0][0]
+        for card in self.clientCards[1:4]:
+            if(len(self.clientCards[0]) > 2):
+                if(kind != card[0:1]):
+                    return False
+            else:
+                if(kind != card[0]):
+                    return False
+        self.isWinner = True
+        self.score += 1
+        return True
 
 class Game:
     def main(self):
@@ -51,33 +72,54 @@ class Game:
                 print('\n Please choose a number.\n')
 
     def start_server(self):
+        HOST = socket.gethostbyname(socket.gethostname())
         PORT = int(input(" Enter port number: "))
         NUMBER_OF_PLAYERS = int(input(" Enter number of players: "))
-        global CLIENTS
-        global SUITS, CARDS
-        NUMBERS= list(range(1,NUMBER_OF_PLAYERS+1))
+        global CLIENTS, SUITS, CARDS, isEND
+        isEND = False
+        NUMBERS = list(range(1,NUMBER_OF_PLAYERS+1))
         for number in NUMBERS:
             for suit in SUITS:
                 CARDS.append(str(number)+suit)
-        while NUMBER_OF_PLAYERS <= 2 or NUMBER_OF_PLAYERS > 13:
-            print(" Minimum number of players is 3 and maximum is 13")
-            NUMBER_OF_PLAYERS = int(input(" Enter number of players: "))
 
-        print(" Waiting for "+str(NUMBER_OF_PLAYERS)+" clients on port "+str(PORT)+"...")
+        # while NUMBER_OF_PLAYERS <= 2 or NUMBER_OF_PLAYERS > 13:
+        #     print(" Minimum number of players is 3 and maximum number of players is 13")
+        #     NUMBER_OF_PLAYERS = int(input(" Enter number of players: "))
+
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        host = socket.gethostname()
-        s.bind((host,PORT))
-        s.listen(5)
+        # host = "192.168.1.20"
+        s.bind((HOST,PORT))
+        s.listen(1)
         for i in range(NUMBER_OF_PLAYERS):
+            print(" Waiting for "+str(NUMBER_OF_PLAYERS - len(CLIENTS))+" client/s on port "+str(PORT)+"...")
             clientSocket, clientAddress = s.accept()
             CLIENTS.append(ClientThread(clientSocket,clientAddress))
-            
+
         while len(CARDS) != 0:
             for client in CLIENTS:
                 index = random.randint(0,len(CARDS)-1)
                 card = CARDS.pop(index)
-                client.giveCards(card)
+                client.clientCards.append(card)
         while True:
+            for client in CLIENTS:
+                if(not isEND):
+                    isEND = client.checkIfComplete()
+            if(not isEND):
+                for client in CLIENTS:
+                    data_string = pickle.dumps(client.clientCards)
+                    client.clientSocket.send(data_string)
+            else:
+                for client in CLIENTS:
+                    if(client.isWinner):
+                        client.clientSocket.send(b'WIN')
+                    else:
+                        client.clientSocket.send(b'LOSE')
+                    data_string = pickle.dumps(client.clientCards)
+                    client.clientSocket.send(data_string)
+            for client in CLIENTS:
+                print("Client "+str(CLIENTS.index(client))+" has " + str(client.clientCards))
+            if(isEND):
+                break
             for client in CLIENTS:
                 client.getCards()
             if(len(CARDS) == NUMBER_OF_PLAYERS):
@@ -87,6 +129,9 @@ class Game:
                     else:
                         CLIENTS[i].passCard(CLIENTS[i+1])
 
+        print("GAME OVER!")
+        for client in CLIENTS:
+            print("Client "+str(CLIENTS.index(client))+" has " + str(client.score))        
 
     def game_instructions(self):
         print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")
