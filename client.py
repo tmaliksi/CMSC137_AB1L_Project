@@ -14,6 +14,15 @@ class Card:
 			self.value = card[0]
 			self.suit = card[1]
 
+		if(self.value == "1"):
+			self.value = "A"
+		elif(self.value == "11"):
+			self.value = "J"
+		elif(self.value == "12"):
+			self.value = "Q"
+		elif(self.value == "13"):
+			self.value = "K"
+
 		if(self.suit == "C"):
 			self.suit = '\N{BLACK CLUB SUIT}'
 		elif(self.suit == "S"):
@@ -28,20 +37,23 @@ class Game:
 		menu_loop = True
 		while menu_loop:
 			print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Menu: \n ")
-			print(" [1] Connect to a server \n [2] Instructions/Controls \n [3] About the Game \n [4] Exit \n")
+			print(" [1] Connect to a server \n [2] Tutorial Game \n [3] Instructions/Controls \n [4] About the Game \n [5] Exit \n")
 			menu_option = input('\n >>> Enter: ')
 			print('\n -----------------------------------------------------------')
 
 			if menu_option == '1':
 					#play_game()
 					self.connect_to_server()
-			elif menu_option == '2':
+			elif menu_option == "2":
+					#play_tutorial()
+					self.tutorial_demo()
+			elif menu_option == '3':
 					#game instructions
 					self.display_instructions()
-			elif menu_option == '3':
+			elif menu_option == '4':
 					#about the game
 					self.display_description()
-			elif menu_option == '4':
+			elif menu_option == '5':
 					#quit game
 					menu_loop = False
 			else:
@@ -52,8 +64,76 @@ class Game:
 		print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")
 
 	def display_description(self):
-	 print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n About the Game: \n This program is created by Peter John Castillo, Abigail \n Fernandez, Troy Abraham Maliksi, and Arvin Sartillo as part \n of the final requirements for CMSC 137 Data Communications \n and Networking. \n -----------------------------------------------------------\n")
+		print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n About the Game: \n This program is created by Peter John Castillo, Abigail \n Fernandez, Troy Abraham Maliksi, and Arvin Sartillo as part \n of the final requirements for CMSC 137 Data Communications \n and Networking. \n -----------------------------------------------------------\n")
 
+	def tutorial_demo(self):
+		tutorial_loop = True
+		while tutorial_loop:
+			print("-------------Welcome to the 1-2-3 Pass Tutorial-------------")
+			print("1) To start, you will be given 4 random cards, like what you see below")
+			DEMO_CARDS = (Card("1S"), Card("1H"), Card("1D"), Card("1C"), Card("3H"), Card("13K"))
+			print("Card List: ")
+			print('┌───────┐	┌───────┐	┌───────┐	┌───────┐')
+			print(f'| {DEMO_CARDS[0].value:<2}    |	| {DEMO_CARDS[1].value:<2}    |	| {DEMO_CARDS[2].value:<2}    |	| {DEMO_CARDS[5].value:<2}    |')
+			print('|       |	|       |	|       |	|       |')
+			print(f'|   {DEMO_CARDS[0].suit}   |	|   {DEMO_CARDS[1].suit}   |	|   {DEMO_CARDS[2].suit}   |	|   {DEMO_CARDS[5].suit}   |')
+			print('|       |	|       |	|       |	|       |')
+			print(f'|    {DEMO_CARDS[0].value:>2} |	|    {DEMO_CARDS[1].value:>2} |	|    {DEMO_CARDS[2].value:>2} |	|    {DEMO_CARDS[5].value:>2} |')
+			print('└───────┘	└───────┘	└───────┘	└───────┘')
+			print('    1    	    2    	    3    	    4    ')
+			tutorial_option = input('\nEnter 1 to continue, 2 to exit to menu: ')
+			
+			if tutorial_option == '1':
+				print("Now we move onto passing cards! \nTo pass a card, simply type in the number corresponding said card.")
+				print("Card List: ")
+				print('┌───────┐	┌───────┐	┌───────┐	┌───────┐')
+				print(f'| {DEMO_CARDS[0].value:<2}    |	| {DEMO_CARDS[1].value:<2}    |	| {DEMO_CARDS[2].value:<2}    |	| {DEMO_CARDS[5].value:<2}    |')
+				print('|       |	|       |	|       |	|       |')
+				print(f'|   {DEMO_CARDS[0].suit}   |	|   {DEMO_CARDS[1].suit}   |	|   {DEMO_CARDS[2].suit}   |	|   {DEMO_CARDS[5].suit}   |')
+				print('|       |	|       |	|       |	|       |')
+				print(f'|    {DEMO_CARDS[0].value:>2} |	|    {DEMO_CARDS[1].value:>2} |	|    {DEMO_CARDS[2].value:>2} |	|    {DEMO_CARDS[5].value:>2} |')
+				print('└───────┘	└───────┘	└───────┘	└───────┘')
+				print('    1    	    2    	    3    	    4    ')
+				pass_option = input("For example, let us pass the King of Spades, so press 4 to pass: ")
+
+				if pass_option == '4':
+					print("Card List: ")
+					print('┌───────┐	┌───────┐	┌───────┐	┌───────┐')
+					print(f'| {DEMO_CARDS[0].value:<2}    |	| {DEMO_CARDS[1].value:<2}    |	| {DEMO_CARDS[2].value:<2}    |	| {DEMO_CARDS[4].value:<2}    |')
+					print('|       |	|       |	|       |	|       |')
+					print(f'|   {DEMO_CARDS[0].suit}   |	|   {DEMO_CARDS[1].suit}   |	|   {DEMO_CARDS[2].suit}   |	|   {DEMO_CARDS[4].suit}   |')
+					print('|       |	|       |	|       |	|       |')
+					print(f'|    {DEMO_CARDS[0].value:>2} |	|    {DEMO_CARDS[1].value:>2} |	|    {DEMO_CARDS[2].value:>2} |	|    {DEMO_CARDS[4].value:>2} |')
+					print('└───────┘	└───────┘	└───────┘	└───────┘')
+					print('    1    	    2    	    3    	    4    ')
+					print("Great! We passed the card! And we received a different card of 3 of Hearts!")
+					pass2_option = input("But we need a full suit to win the game so we shall pass a card again. Type in 4: ")
+
+					if pass2_option == '4':
+						print("Card List: ")
+						print('┌───────┐	┌───────┐	┌───────┐	┌───────┐')
+						print(f'| {DEMO_CARDS[0].value:<2}    |	| {DEMO_CARDS[1].value:<2}    |	| {DEMO_CARDS[2].value:<2}    |	| {DEMO_CARDS[3].value:<2}    |')
+						print('|       |	|       |	|       |	|       |')
+						print(f'|   {DEMO_CARDS[0].suit}   |	|   {DEMO_CARDS[1].suit}   |	|   {DEMO_CARDS[2].suit}   |	|   {DEMO_CARDS[3].suit}   |')
+						print('|       |	|       |	|       |	|       |')
+						print(f'|    {DEMO_CARDS[0].value:>2} |	|    {DEMO_CARDS[1].value:>2} |	|    {DEMO_CARDS[2].value:>2} |	|    {DEMO_CARDS[3].value:>2} |')
+						print('└───────┘	└───────┘	└───────┘	└───────┘')
+						print('    1    	    2    	    3    	    4    ')
+						print("We passed the card and received a 1 of Clubs!")
+						back_option = input("You have won the game! Please type in 1 to go back menu: ")
+
+						if back_option == '1':
+							break
+						else:
+							print("\nPlease type 1!\n")
+					else:
+						print("\nPlease type in 4!")
+				else:
+					print('\nPlease type in 4!\n')
+			elif tutorial_option == '2':
+				break
+			else:
+				print("\nPlease input an option!\n")
 
 	def connect_to_server(self):
 		HOST = input(" Enter IP address of server: ")
