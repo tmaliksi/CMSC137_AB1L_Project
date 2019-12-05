@@ -33,7 +33,7 @@ class ClientThread(threading.Thread):
 
     def checkIfComplete(self):
         if(len(self.clientCards[0]) > 2):
-            kind = self.clientCards[0][0:1]
+            kind = self.clientCards[0][0:2]
         else:
             kind = self.clientCards[0][0]
         for card in self.clientCards[1:4]:
@@ -131,7 +131,7 @@ class Game:
 
         print("GAME OVER!")
         for client in CLIENTS:
-            print("Client "+str(CLIENTS.index(client))+" has " + str(client.score))        
+            print("Client "+str(CLIENTS.index(client))+" has " + str(client.score))
 
     def game_instructions(self):
         print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")

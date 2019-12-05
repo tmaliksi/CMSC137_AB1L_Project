@@ -2,7 +2,35 @@
 import os, pickle, socket, sys
 
 CARDS = []
+isWIN = False
 isEND = False
+
+class Card:
+	def __init__(self,card):
+		if(len(card) > 2):
+			self.value = card[0:2]
+			self.suit = card[2]
+		else:
+			self.value = card[0]
+			self.suit = card[1]
+
+		if(self.suit == "C"):
+			self.suit = '\N{BLACK CLUB SUIT}'
+		elif(self.suit == "S"):
+			self.suit = '\N{BLACK SPADE SUIT}'
+		elif(self.suit == "H"):
+			self.suit = '\N{BLACK HEART SUIT}'
+		else:
+			self.suit = '\N{BLACK DIAMOND SUIT}'
+
+	def print(self):
+		print('┌───────┐')
+		print(f'| {self.value:<2}    |')
+		print('|       |')
+		print(f'|   {self.suit}   |')
+		print('|       |')
+		print(f'|    {self.value:>2} |')
+		print('└───────┘')
 
 class Game:
 	def main(self):
@@ -40,58 +68,48 @@ class Game:
 		# HOST = input(" Enter IP address of server: ")
 		# PORT = int(input(" Enter port number: "))
 		HOST = socket.gethostbyname(socket.gethostname())
-		PORT = 8081
-		global CARDS, isEND
+		PORT = 8080
+		global CARDS, isEND, isWIN
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((HOST,PORT))
 		while True:
-			data = s.recv(4096)
-			# if data:
-			# 	s.send(b"OK")
+			data = s.recv(5120)
 			try:
 				CARDS = pickle.loads(data)
 			except pickle.UnpicklingError:
 				if(data.decode('utf-8') == "WIN"):
-					print("You won!")
+					isWIN = True
 				else:
-					print("You lose")
+					isWIN = False
 				data = s.recv(4096)
 				CARDS = pickle.loads(data)
 				isEND = True
-			# CARDS.append(data.decode("utf-8"))
 
 			if len(CARDS) == 4:
-				os.system('clear')
-				for i in range(4):
-					if(len(CARDS[i]) > 2):
-						if(CARDS[i][0:1] == "10"):
-							print(str(i+1), ": ", CARDS[i][0:1], end="")
-						elif(CARDS[i][0:1] == "11"):
-							print(str(i+1), ": Jack", end="")
-						elif(CARDS[i][0:1] == "12"):
-							print(str(i+1), ": Queen", end="")
-						elif(CARDS[i][0:1] == "13"):
-							print(str(i+1), ": King", end="")
-					elif(CARDS[i][0] == "1"):
-						print(str(i+1), ": Ace", end="")
-					else:
-						print(str(i+1), ": ", CARDS[i][0], end="")
-					suit = CARDS[i][len(CARDS[i])-1]
-					if suit == "C":
-						print(" of Clubs")
-					elif suit == "S":
-						print(" of Spades")
-					elif suit == "H":
-						print(" of Hearts")
-					else:
-						print(" of Diamonds")
+				try:
+					os.system('clear')
+				except:
+					os.system('cls')
 
-				if(len(CARDS[0]) > 2):
-					kind = CARDS[0][0:1]
-				else:
-					kind = CARDS[0][0]
+				for card in CARDS:
+					card = CARDS.pop(0)
+					CARDS.append(Card(card))
+
+				print('┌───────┐	┌───────┐	┌───────┐	┌───────┐')
+				print(f'| {CARDS[0].value:<2}    |	| {CARDS[1].value:<2}    |	| {CARDS[2].value:<2}    |	| {CARDS[3].value:<2}    |')
+				print('|       |	|       |	|       |	|       |')
+				print(f'|   {CARDS[0].suit}   |	|   {CARDS[1].suit}   |	|   {CARDS[2].suit}   |	|   {CARDS[3].suit}   |')
+				print('|       |	|       |	|       |	|       |')
+				print(f'|    {CARDS[0].value:>2} |	|    {CARDS[1].value:>2} |	|    {CARDS[2].value:>2} |	|    {CARDS[3].value:>2} |')
+				print('└───────┘	└───────┘	└───────┘	└───────┘')
+				print('    1    	    2    	    3    	    4    ')
+
 				if(isEND):
+					if(isWIN):
+						print("You won!\n")
+					else:
+						print("You lose")
 					break
 				index = int(input("Enter number of card you wish to pass: "))
 				cardToPass = str(index-1)
