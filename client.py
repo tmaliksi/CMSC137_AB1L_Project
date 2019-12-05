@@ -1,7 +1,8 @@
 # import needed modules
-import os, socket, sys
+import os, pickle, socket, sys
 
 CARDS = []
+isEND = False
 
 class Game:
 	def main(self):
@@ -38,20 +39,28 @@ class Game:
 	def connect_to_server(self):
 		# HOST = input(" Enter IP address of server: ")
 		# PORT = int(input(" Enter port number: "))
-		HOST = "192.168.1.6"
+		HOST = socket.gethostbyname(socket.gethostname())
 		PORT = 8081
-		global CARDS
+		global CARDS, isEND
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((HOST,PORT))
 		while True:
-			while len(CARDS) != 4:
-				data = s.recv(1024)
-				if data:
-					s.send(b"OK")
-				print("Received" + data.decode("utf-8"))
-				CARDS.append(data.decode("utf-8"))
-				
+			data = s.recv(4096)
+			# if data:
+			# 	s.send(b"OK")
+			try:
+				CARDS = pickle.loads(data)
+			except pickle.UnpicklingError:
+				if(data.decode('utf-8') == "WIN"):
+					print("You won!")
+				else:
+					print("You lose")
+				data = s.recv(4096)
+				CARDS = pickle.loads(data)
+				isEND = True
+			# CARDS.append(data.decode("utf-8"))
+
 			if len(CARDS) == 4:
 				os.system('clear')
 				for i in range(4):
@@ -82,9 +91,10 @@ class Game:
 					kind = CARDS[0][0:1]
 				else:
 					kind = CARDS[0][0]
-
+				if(isEND):
+					break
 				index = int(input("Enter number of card you wish to pass: "))
-				cardToPass = CARDS.pop(index-1)
+				cardToPass = str(index-1)
 				s.send(cardToPass.encode('utf-8'))
 		s.close()
 
