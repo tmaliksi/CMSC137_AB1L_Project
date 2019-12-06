@@ -174,6 +174,9 @@ class Game:
                 for client in CLIENTS:
                     client.clientSocket.send(b'Y')
                 self.start_game()
+            else:
+                for client in CLIENTS:
+                    client.clientSocket.send(b'N')
 
 
     def game_instructions(self):
