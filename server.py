@@ -52,11 +52,15 @@ class ClientThread(threading.Thread):
         return True
 
 class Game:
+    def display_description(self):
+        print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n About the Game: \n This program is created by Peter John Castillo, Abigail \n Fernandez, Troy Abraham Maliksi, and Arvin Sartillo as part \n of the final requirements for CMSC 137 Data Communications \n and Networking. \n -----------------------------------------------------------\n")
+        input(" Enter any key to continue...")
+
     def main(self):
         menu_loop = True
         while menu_loop:
             print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Menu: \n ")
-            print(" [1] Start Server \n [2] Instructions/Controls \n [3] About the Game \n [4] Exit \n")
+            print(" [1] Start Server \n [2] About the Game \n [3] Exit \n")
             menu_option = input('\n >>> Enter: ')
             print('\n -----------------------------------------------------------')
 
@@ -65,12 +69,9 @@ class Game:
                 self.start_server()
                 self.start_game()
             elif menu_option == '2':
-                #game instructions
-                self.game_instructions()
-            elif menu_option == '3':
                 #about the game
-                self.about_the_game()
-            elif menu_option == '4':
+                self.display_description()
+            elif menu_option == '3':
                 #quit game
                 menu_loop = False
             else:

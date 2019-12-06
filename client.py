@@ -62,9 +62,11 @@ class Game:
 
 	def display_instructions(self):
 		print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n Instructions: \n Each player will be dealt with 4 cards. Players will pass \n one card to their right until one of them gets four of a \n kind. The player who first gets a four of a kind will be \n declared the winner.\n\n -----------------------------------------------------------\n")
+		input(" Enter any key to continue...")
 
 	def display_description(self):
 		print("\n -----------------------------------------------------------\n                     1-2-3 Pass Game\n About the Game: \n This program is created by Peter John Castillo, Abigail \n Fernandez, Troy Abraham Maliksi, and Arvin Sartillo as part \n of the final requirements for CMSC 137 Data Communications \n and Networking. \n -----------------------------------------------------------\n")
+		input(" Enter any key to continue...")
 
 	def tutorial_demo(self):
 		tutorial_loop = True
@@ -136,10 +138,10 @@ class Game:
 				print("\nPlease input an option!\n")
 
 	def connect_to_server(self):
-		# HOST = input(" Enter IP address of server: ")
-		HOST = "192.168.1.20"
-		# PORT = int(input(" Enter port number: "))
-		PORT = 8081
+		HOST = input(" Enter IP address of server: ")
+		# HOST = "192.168.1.20"
+		PORT = int(input(" Enter port number: "))
+		# PORT = 8081
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		try:
