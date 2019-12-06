@@ -1,5 +1,5 @@
 # import needed modules
-import os, pickle, socket, sys
+import os, pickle, socket, struct, sys
 
 CARDS = []
 isWIN = False
@@ -82,7 +82,7 @@ class Game:
 			print('└───────┘	└───────┘	└───────┘	└───────┘')
 			print('    1    	    2    	    3    	    4    ')
 			tutorial_option = input('\nEnter 1 to continue, 2 to exit to menu: ')
-			
+
 			if tutorial_option == '1':
 				print("Now we move onto passing cards! \nTo pass a card, simply type in the number corresponding said card.")
 				print("Card List: ")
@@ -136,25 +136,41 @@ class Game:
 				print("\nPlease input an option!\n")
 
 	def connect_to_server(self):
-		HOST = input(" Enter IP address of server: ")
-		PORT = int(input(" Enter port number: "))
-		global CARDS, isEND, isWIN
+		# HOST = input(" Enter IP address of server: ")
+		HOST = "192.168.1.20"
+		# PORT = int(input(" Enter port number: "))
+		PORT = 8081
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.connect((HOST,PORT))
+		try:
+			s.connect((HOST,PORT))
+		except:
+			print(f"\n Server in {HOST}:{PORT} not yet started!\n")
+			input(" Enter any key to return to menu...")
+			return
 		name = input(" Enter your name: ")
 		s.send(name.encode('utf-8'))
+		self.start_game(s)
+	def start_game(self,s):
+		global CARDS, isEND, isWIN
 		while True:
-			data = s.recv(5120)
-			try:
-				CARDS = pickle.loads(data)
-			except pickle.UnpicklingError:
-				if(data.decode('utf-8') == "WIN"):
+			buf = b''
+			while len(buf) < 4:
+				buf += s.recv(4-len(buf))
+			length = struct.unpack('!I', buf)[0]
+			data = pickle.loads(s.recv(length))
+			if(isinstance(data,list)):
+				CARDS = data
+			else:
+				if(data == "WIN"):
 					isWIN = True
-				else:
+				elif(data == "LOSE"):
 					isWIN = False
-				data = s.recv(4096)
-				CARDS = pickle.loads(data)
+				buf = b''
+				while len(buf) < 4:
+					buf += s.recv(4-len(buf))
+				length = struct.unpack('!I', buf)[0]
+				CARDS = pickle.loads(s.recv(length))
 				isEND = True
 
 			if len(CARDS) == 4:
@@ -178,13 +194,43 @@ class Game:
 
 				if(isEND):
 					if(isWIN):
-						print("You won!\n")
-					else:
-						print("You lose")
-					break
-				index = int(input("Enter number of card you wish to pass: "))
+						input(" You got four-of-a-kind! Enter any key quickly...")
+						break
+				while True:
+					try:
+						index = int(input("Enter number of card you wish to pass: "))
+						break
+					except:
+						print("\nInput not valid!\n")
+
 				cardToPass = str(index-1)
 				s.send(cardToPass.encode('utf-8'))
+		buf = b''
+		while len(buf) < 4:
+			buf += s.recv(4-len(buf))
+		length = struct.unpack('!I', buf)[0]
+		scores = pickle.loads(s.recv(length))
+		print("==============SCOREBOARD=============")
+		for name, val in scores.items():
+			print(f"||        {name} =  {val}	    	||")
+		print("=====================================")
+		while True:
+			try:
+				print("Do you want to play again? ")
+				choice = int(input(" [1] Yes or [2] No  >>"))
+				break
+			except:
+				print("\nInput not valid!\n")
+		if(choice == 1):
+			print("Waiting for other players...")
+			s.send(b'Y')
+			if(s.recv(1024).decode('utf-8') == 'N'):
+				print("Goodbye")
+			else:
+				self.start_game(s)
+		elif(choice == 2):
+			print("Goodbye")
+			s.send(b'N')
 		s.close()
 
 game = Game()
