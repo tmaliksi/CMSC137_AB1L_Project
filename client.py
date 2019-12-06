@@ -198,9 +198,15 @@ class Game:
 					if(isWIN):
 						input(" You got four-of-a-kind! Enter any key quickly...")
 						break
+					else:
+						input(" Another player has won. Enter any key to continue...")
+						break
 				while True:
 					try:
 						index = int(input("Enter number of card you wish to pass: "))
+						while(index > 4):
+							print("\nInput not valid!\n")
+							index = int(input("Enter number of card you wish to pass: "))
 						break
 					except:
 						print("\nInput not valid!\n")
