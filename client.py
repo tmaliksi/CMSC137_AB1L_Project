@@ -1,6 +1,7 @@
 # import needed modules
 import os, pickle, socket, struct, sys
 
+# initialize required variables
 CARDS = []
 isWIN = False
 isEND = False
@@ -155,6 +156,9 @@ class Game:
 		self.start_game(s)
 	def start_game(self,s):
 		global CARDS, isEND, isWIN
+		CARDS = []
+		isEND = False
+		isWIN = False
 		while True:
 			buf = b''
 			while len(buf) < 4:
